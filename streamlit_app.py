@@ -2,6 +2,7 @@ import streamlit as st
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chains.llm_math.base import LLMMathChain
 from langchain.llms import OpenAI
+from langchain.utilities import PythonREPL
 from langchain.agents import initialize_agent, Tool
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -10,7 +11,7 @@ from gpt_index import GPTSimpleVectorIndex, WikipediaReader
 from sqlalchemy import create_engine
 
 st.set_page_config(
-    page_title="Demo", page_icon=":bird:"
+    page_title="Demo", page_icon="🌩️"
 )
 st.header("Snowflake Demo")
 st.write(
@@ -39,12 +40,26 @@ tools = [
     Tool(
         name="Snowflake Transactions",
         func=lambda q: db_chain.run(q),
-        description="Use this when you want to answer questions about customer orders, spending, purchases, and transactions. The input to this tool should be a complete english sentence.",
+        description="""Use this when you want to answer questions about customer orders, spending, purchases, and transactions. 
+            The input to this tool should be a complete english sentence.
+            Fetch only max 10 records always.
+            I always need output as python data frame.""",
     ),
     Tool(
         "Calculator",
         LLMMathChain(llm=llm).run,
-        "Useful for when you need to make any math calculations. Use this tool for any and all numerical calculations. The input to this tool should be a mathematical expression.",
+        """Useful for when you need to make any math calculations. 
+        Use this tool for any and all numerical calculations. 
+        The input to this tool should be a mathematical expression.""",
+    ),
+    Tool(
+        "PythonREPL",
+        PythonREPL().run,
+        """Useful for running python code. Inout to this would be python code.
+        This interface will only return things that are printed, 
+        therefore if you want to use it to calculate an answer, 
+        make sure to have it print out the answer.
+        """,
     ),
 ]
 
