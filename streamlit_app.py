@@ -13,7 +13,7 @@ from sqlalchemy import create_engine
 st.set_page_config(
     page_title="Demo", page_icon="🌩️"
 )
-st.header("Snowflake Demo")
+st.subheader("Snowflake Demo")
 st.write(
     "👋 This is a demo of connecting an LLM to a Snowflake database"
 )
@@ -35,6 +35,13 @@ def build_snowflake_chain():
     return db_chain
 
 db_chain = build_snowflake_chain()
+
+st.write("Examples you can try:")
+st.write("""
+    - Give me top 10 nations by order count, also return their order counts
+    - Give me top 10 customers by order count, also return their order counts
+    - Give me top 10 customer names by total order value, also get their total order values
+""")
 
 PROMPT_TEMPLATE = """
     When you are asked to retrieve data, always add a hard limit of 10 to all the queries.
