@@ -31,10 +31,20 @@ def build_snowflake_chain():
 
     st.write("❄️ Snowflake database connected")
 
-    db_chain = SQLDatabaseChain(llm=llm, database=sql_database)
+    db_chain = SQLDatabaseChain(llm=llm, database=sql_database, return_direct=True, top_k=10)
     return db_chain
 
 db_chain = build_snowflake_chain()
+
+PROMPT_TEMPLATE = """
+    When you are asked to retrieve data, always add a hard limit of 10 to all the queries.
+    ###
+    {query}
+"""
+prompt = PromptTemplate(
+        input_variables=["query"],
+        template=PROMPT_TEMPLATE,
+    )
 
 tools = [
     Tool(
@@ -78,7 +88,8 @@ if user_input:
     if user_input == "":
         st.session_state["generated"] = ""
     else:
-        output = agent_chain.run(input=user_input)
+        output = agent_chain.run(prompt.format(query=user_input))
+        # output = agent_chain.run(input=user_input)
         st.session_state["generated"] = output
 
 st.write(st.session_state["generated"])
